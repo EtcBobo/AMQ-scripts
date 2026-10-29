@@ -5,8 +5,15 @@ Game Mode Roller - Final Version
 - No duplicate game settings across any rounds
 - User's allowed_S restrictions preserved
 - Player list mode with player selection
-- Mastery sub-settings (Novice/Intermediate) are reusable across rounds
-- Mastery MODES and TOP X Random only appear once across all rounds
+- Mastery modes (OPs, EDs, INs, OPEDs, OPINs, EDINs, OPEDINS - all "DNGMC"):
+    * each mastery MODE can only appear once across all rounds
+    * each has 3 difficulties (Novice / Intermediate / Full), rolled AFTER the player count:
+        Novice       -> 1v1 or 2v2
+        Intermediate -> 2v2, 3v3 or 4v4
+        Full         -> 3v3 or 4v4
+    * difficulties are reusable across rounds (only the mode itself is once-only)
+- Novice Ranked DNGMC is no longer a mastery mode (it can't roll a difficulty), but is still once-only
+- TOP X Random only appears once across all rounds, and is 2v2 only
 - 4v4 Grand Prix is ONE entry (4v4 only, once across all rounds); its 8 variants and a Distance (Sprint/Mile/Medium/Long) are rolled only after it is picked
 """
 
@@ -25,7 +32,7 @@ PLAYER_LIST: Dict[str, Tuple[str, str]] = {
     "Yonakax_": ("https://anilist.co/user/yonakaa/animelist", "Completed only"),
     "Chiabobo": ("https://myanimelist.net/animelist/Chiabobo", "Completed only"),
     "AngelAir": ("https://myanimelist.net/profile/RandomAir", "Completed only"),
-    "zxphxr": ("https://myanimelist.net/profile/Zxphxr", "Watching and Completed"),
+    "zxphxr": ("https://myanimelist.net/profile/Zxphxr", "Completed only"),
     "Ireland": ("https://myanimelist.net/profile/IrishandProud", "Watching and Completed"),
     "bofu": ("https://anilist.co/user/bofu/", "Completed only"),
     "Almin41": ("https://anilist.co/user/Almin41/", "Watching and Completed"),
@@ -63,13 +70,18 @@ TOP_LEVEL = {
     "Watched Random Tag (Weighted)": (1, 1, 1),
     "Watched Random Genre (Weighted)": (1, 1, 1),
     "Watched Years (Weighted)": (1, 1, 1),
-    "OPEDINS Mastery DNGMC": (2, 4, 1),
+    # ---- Mastery modes: S range is the union of all difficulties (1-4).
+    # The actual allowed S per difficulty lives in SUB_SETTINGS. ----
+    "OPs Mastery DNGMC": (1, 4, 1),
+    "EDs Mastery DNGMC": (1, 4, 1),
+    "INs Mastery DNGMC": (1, 4, 1),
+    "OPEDs Mastery DNGMC": (1, 4, 1),
+    "OPINs Mastery DNGMC": (1, 4, 1),
+    "EDINs Mastery DNGMC": (1, 4, 1),
+    "OPEDINS Mastery DNGMC": (1, 4, 1),
     "Random Chanting": (2, 2, 1),
-    "OPs Mastery 1v1/2v2 (Team vs Team)": (1, 2, 1),
-    "EDs Mastery 1v1/2v2 (Team vs Team)": (1, 2, 1),
-    "INs Mastery 1v1/2v2 (Team vs Team)": (1, 2, 1),
     "Novice Ranked DNGMC": (3, 4, 1),
-    "TOP X Random (team vs team)": (2, 3, 1),
+    "TOP X Random (team vs team)": (2, 2, 1),
     "Random Tags/Genre: (1v1)": (1, 1, 1),
     "Female Artists/Male Artists": (1, 1, 1),
     "Groups": (1, 1, 1),
@@ -86,55 +98,52 @@ SPECIAL_MODES = {
     "Extras",
 }
 
-# Mastery-type modes. Kept separate so we can still identify them
-# for sub-setting reuse logic if needed.
+# Mastery modes: each rolls a difficulty (Novice / Intermediate / Full).
+# Novice Ranked DNGMC is NOT part of this group (it has no difficulty to roll).
 MASTERY_MODES = {
+    "OPs Mastery DNGMC",
+    "EDs Mastery DNGMC",
+    "INs Mastery DNGMC",
+    "OPEDs Mastery DNGMC",
+    "OPINs Mastery DNGMC",
+    "EDINs Mastery DNGMC",
     "OPEDINS Mastery DNGMC",
-    "OPs Mastery 1v1/2v2 (Team vs Team)",
-    "EDs Mastery 1v1/2v2 (Team vs Team)",
-    "INs Mastery 1v1/2v2 (Team vs Team)",
-    "Novice Ranked DNGMC",
 }
 
 # Modes that can only appear ONCE across all rounds.
-# Includes all mastery-type modes plus TOP X Random.
+# Includes all mastery modes, Novice Ranked, Random Chanting and TOP X Random.
 ONCE_ONLY_MODES = MASTERY_MODES | {
+    "Novice Ranked DNGMC",
     "Random Chanting",
     "TOP X Random (team vs team)",
 }
 
-# Modes where sub-settings (Novice/Intermediate) are reusable across rounds.
+# Modes where sub-settings (difficulties) are reusable across rounds.
 # Only the mode itself is restricted to once across all rounds.
 # For these modes, the sub-setting uniqueness check is skipped.
-REUSABLE_SUBSETTING_MODES = {
-    "OPEDINS Mastery DNGMC",
-    "Novice Ranked DNGMC",
-    "OPs Mastery 1v1/2v2 (Team vs Team)",
-    "EDs Mastery 1v1/2v2 (Team vs Team)",
-    "INs Mastery 1v1/2v2 (Team vs Team)",
-}
+REUSABLE_SUBSETTING_MODES = MASTERY_MODES | {"Novice Ranked DNGMC"}
 
 # 4v4 Grand Prix is a single entry inside Watched Game Modes (Team). It can only be
 # rolled once across all rounds (the normal (mode, sub-setting) uniqueness check
 # handles that). Only after it has been picked do we roll one of its 8 variants.
-GRAND_PRIX_NAME = "Uma Musume 4v4 Grand Prix"
+GRAND_PRIX_NAME = "4v4 Grand Prix"
 GRAND_PRIX_VARIANTS: List[Tuple[str, str]] = [
     ("Firm: OPs 0-100 - Equal Dist",
-     "m0g1421111110111314000031000000001411111111111100k011o000000f352143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-11111--"),
+     "m0g1421111110111314000031000000001411111111111100k011o000000f352143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-111110a1--"),
     ("Firm: OPs 0-100 - Random Dist",
-     "m0g1421111110111314000011000000001411111111111100k011o000000f352143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-11111--"),
+     "m0g1421111110111314000011000000001411111111111100k011o000000f352143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-111110a1--"),
     ("Good: OPEDs 0-100 - Equal Dist",
-     "m0g1421111110111314000031100000001411111111111100k011o000000f352143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-11111--"),
+     "m0g1421111110111314000031100000001411111111111100k011o000000f352143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-111110a1--"),
     ("Good: OPEDs 0-100 - Random Dist",
-     "m0g1421111110111314000011100000001411111111111100k011o000000f352143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-11111--"),
+     "m0g1421111110111314000011100000001411111111111100k011o000000f352143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-111110a1--"),
     ("Soft: OPEDINS 30-60 - Equal Dist",
-     "m0g1421111110111314000031110000001411111111111100k011o000000f352143331110000k012r02i0a8c133a11002s0111111111110u1o1111002s01a111111111102a111111111050017pr11hg1ka03-11111--"),
+     "m0g1421111110111314000031110000001411111111111100k011o000000f352143331110000k012r02i0a8c133a110u1o011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-111110a1--"),
     ("Soft: OPEDINS 30-60 - Random Dist",
-     "m0g1421111110111314000011110000001411111111111100k011o000000f352143331110000k012r02i0a8c133a11002s0111111111110u1o1111002s01a111111111102a111111111050017pr11hg1ka03-11111--"),
+     "m0g1421111110111314000011110000001411111111111100k011o000000f352143331110000k012r02i0a8c133a110u1o011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-111110a1--"),
     ("Heavy: OPEDINS 25-100 - Equal Dist",
-     "m0g1421111110111314000031110000001411111111111100k011o000000f352143331110000k012r02i0a8c133a11002s0111111111110p2s1111002s01a111111111102a111111111050017pr11hg1ka03-11111--"),
+     "m0g1421111110111314000031110000001411111111111100k011o000000f352143331110000k012r02i0a8c133a110p2s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-111110a1--"),
     ("Heavy: OPEDINS 25-100 - Random Dist",
-     "m0g1421111110111314000011110000001411111111111100k011o000000f352143331110000k012r02i0a8c133a11002s0111111111110p2s1111002s01a111111111102a111111111050017pr11hg1ka03-11111--"),
+     "m0g1421111110111314000011110000001411111111111100k011o000000f352143331110000k012r02i0a8c133a110p2s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-111110a1--"),
 ]
 
 # Rolled separately from the variant whenever 4v4 Grand Prix is picked (equal odds).
@@ -197,6 +206,7 @@ SUB_SETTINGS: Dict[str, List[Tuple[str, Optional[Set[int]], str]]] = {
         ("Isekai", None, "m2s0k1111111011130k000021110101000i11111111111100k011o000000f152143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-11111-06s1-"),
         ("Card Battle", None, "m2s0k1111111011130k000021110101000i11111111111100k011o000000f152143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-11111-04y1-"),
         ("Female Harem", None, "m2s0k1111111011130k000021110101000i11111111111100k011o000000f152143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-11111-00n1-"),
+        ("Male Harem", None, "m2s0k1111111011130k000021110101000i11111111111100k011o000000f152143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-11111-03f1-"),
         ("CGDCT", None, "m2s0k1111111011130k000021110101000i11111111111100k011o000000f152143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-11111-02k1-"),
         ("CBDCT", None, "m2s0k1111111011130k000021110101000i11111111111100k011o000000f152143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-11111-0tj1-"),
         ("Shoujo", None, "m2s0k1111111011130k000021110101000i11111111111100k011o000000f152143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-11111-01h1-"),
@@ -226,28 +236,59 @@ SUB_SETTINGS: Dict[str, List[Tuple[str, Optional[Set[int]], str]]] = {
          "m2s0k1111111011130k000021110000000k11111111111100k011o000000f152143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr01k41ka03-11111--"),
     ],
 
-    "OPEDINS Mastery DNGMC": [
-        ("Novice", None, "#5936"),
-        ("Intermediate", None, "#5937"),
+    # ------------------------------------------------------------
+    # Mastery modes. Difficulty (and its allowed player count) is
+    # rolled AFTER the player count S is chosen:
+    #   Novice       -> 1v1, 2v2
+    #   Intermediate -> 2v2, 3v3, 4v4
+    #   Full         -> 3v3, 4v4
+    # Codes are the real mastery codes.
+    # ------------------------------------------------------------
+    "OPs Mastery DNGMC": [
+        ("Novice", {1, 2}, "#5860"),
+        ("Intermediate", {2, 3, 4}, "#5889"),
+        ("Full", {3, 4}, "#9644"),
     ],
+
+    "EDs Mastery DNGMC": [
+        ("Novice", {1, 2}, "#5863"),
+        ("Intermediate", {2, 3, 4}, "#5890"),
+        ("Full", {3, 4}, "#9645"),
+    ],
+
+    "INs Mastery DNGMC": [
+        ("Novice", {1, 2}, "#5866"),
+        ("Intermediate", {2, 3, 4}, "#5891"),
+        ("Full", {3, 4}, "#9646"),
+    ],
+
+    "OPEDs Mastery DNGMC": [
+        ("Novice", {1, 2}, "#5917"),
+        ("Intermediate", {2, 3, 4}, "#5920"),
+        ("Full", {3, 4}, "#9647"),
+    ],
+
+    "OPINs Mastery DNGMC": [
+        ("Novice", {1, 2}, "#5928"),
+        ("Intermediate", {2, 3, 4}, "#5929"),
+        ("Full", {3, 4}, "#9648"),
+    ],
+
+    "EDINs Mastery DNGMC": [
+        ("Novice", {1, 2}, "#5932"),
+        ("Intermediate", {2, 3, 4}, "#5933"),
+        ("Full", {3, 4}, "#9649"),
+    ],
+
+    "OPEDINS Mastery DNGMC": [
+        ("Novice", {1, 2}, "#5936"),
+        ("Intermediate", {2, 3, 4}, "#5937"),
+        ("Full", {3, 4}, "#9650"),
+    ],
+
     "Random Chanting": [
         ("Random Chanting 0-100 OPEDINS (Team vs Team)", None,
          "m2s0k21111110111100000k11110000000k01000100010000k011o000000f152143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-11111--"),
-    ],
-
-    "OPs Mastery 1v1/2v2 (Team vs Team)": [
-        ("Novice", None, "#5860"),
-        ("Intermediate", None, "#5889"),
-    ],
-
-    "EDs Mastery 1v1/2v2 (Team vs Team)": [
-        ("Novice", None, "#5863"),
-        ("Intermediate", None, "#5890"),
-    ],
-
-    "INs Mastery 1v1/2v2 (Team vs Team)": [
-        ("Novice", None, "#5866"),
-        ("Intermediate", None, "#5891"),
     ],
 
     "Novice Ranked DNGMC": [
@@ -255,12 +296,12 @@ SUB_SETTINGS: Dict[str, List[Tuple[str, Optional[Set[int]], str]]] = {
     ],
 
     "TOP X Random (team vs team)": [
-        ("Top 1k (team vs team)", {2, 3},
+        ("Top 1k (team vs team)", {2},
          "m0g0k21111100101100000k11110000000k10111011101100k051o000000f152143331110000k012r02i0a46533a11002s0111111111110u2s0111002s01a111111111102a111111111030017pr11hg1ka03-11111--"),
-        ("Top 500 (team vs team)", {2, 3},
+        ("Top 500 (team vs team)", {2},
          "m0g0k21111100101100000k11110000000k10111011101100k051o000000f152143331110000k012r02i0a46533a11002s0111111111110u2s0111002s01a111111111102a111111111020017pr11hg1ka03-11111--"),
-        ("Top 100 (team vs team)", {2, 3},
-         "m0g0k21111100101100000k11110000000k10111011101100k051o000000f152143331110000k012r02i0a46533a11002s0111111111110u2s0111002s01a111111111102a111111111010017pr11hg1ka03-11111--"),
+        ("Top 100 (team vs team)", {2},
+         "m0g0k21111100101100000k11110000000k10111011101100k051o000000f152143331110000k012r02i0a46533a11002s0111111111110u2s0111002s01a111111111102a111111111020017pr11hg1ka03-11111--"),
     ],
 
 
@@ -280,7 +321,7 @@ SUB_SETTINGS: Dict[str, List[Tuple[str, Optional[Set[int]], str]]] = {
         ("Megumi Nakajima", None, "#202"),
         ("CHiCO", None, "#22165"),
         ("Machico", None, "#14479"),
-        ("Aimer", None, "#25569"),
+        ("Aimer", None, "#26936"),
         ("Kana Hanazawa", None, "#27367"),
         ("Iori Nomizu", None, "#460"),
         ("Sora Amamiya", None, "#217"),
@@ -323,10 +364,6 @@ SUB_SETTINGS: Dict[str, List[Tuple[str, Optional[Set[int]], str]]] = {
         ("TK", None, "#24754"),
         ("Masayoshi Ooishi", None, "#330"),
         ("Manaka Iwami", None, "#27809"),
-        ("Kiyono Yasuno", None, "#3767"),
-        ("Maaya Uchida", None, "#1892"),
-        ("Aimi", None, "125"),
-        ("Takanori Nishikawa", None, "#28155"),
     ],
 
     "Groups": [
@@ -345,7 +382,6 @@ SUB_SETTINGS: Dict[str, List[Tuple[str, Optional[Set[int]], str]]] = {
         ("FLOW", None, "#25386"),
         ("BUMP OF CHICKEN", None, "#588"),
         ("UVERworld", None, "#9374"),
-        ("Round Table ft. Nino", None, "#1538"),
     ],
 
     "Franchise": [
@@ -367,9 +403,6 @@ SUB_SETTINGS: Dict[str, List[Tuple[str, Optional[Set[int]], str]]] = {
         ("UtaPri", None, "#20038"),
         ("Symphogear", None, "#127"),
         ("Macross", None, "#74"),
-        ("Gintama", None, "#808"),
-        ("Naruto", None, "#560"),
-        ("One Piece", None, "#24958"),
     ],
 
     "Composers": [
@@ -377,17 +410,12 @@ SUB_SETTINGS: Dict[str, List[Tuple[str, Optional[Set[int]], str]]] = {
         ("TeddyLoid", None, "#22124"),
         ("Yuki Kajiura", None, "#21879"),
         ("Hiroyuki Sawano", None, "#18790"),
-        ("ryo (supercell)", None, "#27582"),
-        ("I've Sound", None, "#23234"),
     ],
 
     "Extras": [
         ("TRIGGER", None, "#25118"),
         ("Madhouse", None, "#25216"),
         ("CLAMP", None, "#17127"),
-        ("Eurobeat", None, "#260"),
-        ("Studio Wit", None, "#25223"),
-        ("Visual Novels", None, "#97"),
     ],
 }
 
@@ -411,6 +439,9 @@ def get_eligible_subsettings(
 
     For all other modes, a sub-setting is excluded if that exact
     (mode, sub-setting) pair was already used in a previous round.
+
+    In both cases the sub-setting's allowed_S must include the rolled S.
+    (For mastery modes this is what ties difficulty to player count.)
     """
     options = SUB_SETTINGS.get(mode, [])
     eligible = []
@@ -428,6 +459,15 @@ def get_eligible_subsettings(
     return eligible
 
 
+def has_eligible_setting(
+    mode: str,
+    S: int,
+    used_settings: Set[Tuple[str, str]],
+) -> bool:
+    """True if the mode still has at least one rollable setting at player count S."""
+    return bool(get_eligible_subsettings(mode, S, used_settings))
+
+
 def weighted_choice(modes: List[str]) -> str:
     weights = [TOP_LEVEL[m][2] for m in modes]
     return random.choices(modes, weights=weights, k=1)[0]
@@ -437,6 +477,7 @@ def find_valid_combination(
     remaining_specials: int,
     target_sum_S: int,
     used_once_only_modes: Set[str],
+    used_settings: Set[Tuple[str, str]],
     max_modes: int = 8,
 ) -> Optional[List[Tuple[str, int]]]:
     all_modes = list(TOP_LEVEL.keys())
@@ -450,19 +491,28 @@ def find_valid_combination(
         while current_sum < target_sum_S and len(chosen) < max_modes and available:
             candidates = []
             for m in available:
-                # Any once-only mode (all mastery modes + TOP X Random)
-                # can only appear once across all rounds.
+                # Any once-only mode (all mastery modes, Novice Ranked,
+                # Random Chanting, TOP X Random) can only appear once
+                # across all rounds.
                 if m in ONCE_ONLY_MODES and m in used_once_only_modes:
                     continue
 
-                possible = [s for s in get_possible_S(m) if current_sum + s <= target_sum_S]
+                possible = [
+                    s for s in get_possible_S(m)
+                    if current_sum + s <= target_sum_S
+                    and has_eligible_setting(m, s, used_settings)
+                ]
                 if possible:
                     candidates.append(m)
             if not candidates:
                 break
 
             mode = weighted_choice(candidates)
-            possible_S = [s for s in get_possible_S(mode) if current_sum + s <= target_sum_S]
+            possible_S = [
+                s for s in get_possible_S(mode)
+                if current_sum + s <= target_sum_S
+                and has_eligible_setting(mode, s, used_settings)
+            ]
             if not possible_S:
                 available.remove(mode)
                 continue
@@ -509,6 +559,7 @@ def roll_round(
         remaining_specials,
         target_S,
         used_once_only_modes,
+        used_settings,
     )
 
     if combo is None:
@@ -530,7 +581,7 @@ def roll_round(
 
             poss = [
                 s for s in get_possible_S(mode)
-                if s <= left
+                if s <= left and has_eligible_setting(mode, s, used_settings)
             ]
 
             if poss:
