@@ -25,7 +25,7 @@ PLAYER_LIST: Dict[str, Tuple[str, str]] = {
     "Yonakax_": ("https://anilist.co/user/yonakaa/animelist", "Completed only"),
     "Chiabobo": ("https://myanimelist.net/animelist/Chiabobo", "Completed only"),
     "AngelAir": ("https://myanimelist.net/profile/RandomAir", "Completed only"),
-    "zxphxr": ("https://myanimelist.net/profile/Zxphxr", "Completed only"),
+    "zxphxr": ("https://myanimelist.net/profile/Zxphxr", "Watching and Completed"),
     "Ireland": ("https://myanimelist.net/profile/IrishandProud", "Watching and Completed"),
     "bofu": ("https://anilist.co/user/bofu/", "Completed only"),
     "Almin41": ("https://anilist.co/user/Almin41/", "Watching and Completed"),
@@ -197,7 +197,6 @@ SUB_SETTINGS: Dict[str, List[Tuple[str, Optional[Set[int]], str]]] = {
         ("Isekai", None, "m2s0k1111111011130k000021110101000i11111111111100k011o000000f152143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-11111-06s1-"),
         ("Card Battle", None, "m2s0k1111111011130k000021110101000i11111111111100k011o000000f152143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-11111-04y1-"),
         ("Female Harem", None, "m2s0k1111111011130k000021110101000i11111111111100k011o000000f152143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-11111-00n1-"),
-        ("Male Harem", None, "m2s0k1111111011130k000021110101000i11111111111100k011o000000f152143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-11111-03f1-"),
         ("CGDCT", None, "m2s0k1111111011130k000021110101000i11111111111100k011o000000f152143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-11111-02k1-"),
         ("CBDCT", None, "m2s0k1111111011130k000021110101000i11111111111100k011o000000f152143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-11111-0tj1-"),
         ("Shoujo", None, "m2s0k1111111011130k000021110101000i11111111111100k011o000000f152143331110000k012r02i0a8c133a11002s011111111111002s1111002s01a111111111102a111111111050017pr11hg1ka03-11111-01h1-"),
@@ -324,7 +323,10 @@ SUB_SETTINGS: Dict[str, List[Tuple[str, Optional[Set[int]], str]]] = {
         ("TK", None, "#24754"),
         ("Masayoshi Ooishi", None, "#330"),
         ("Manaka Iwami", None, "#27809"),
-        ("Kiyono Yasuno", None, "#3767")
+        ("Kiyono Yasuno", None, "#3767"),
+        ("Maaya Uchida", None, "#1892"),
+        ("Aimi", None, "125"),
+        ("Takanori Nishikawa", None, "#28155"),
     ],
 
     "Groups": [
@@ -343,7 +345,7 @@ SUB_SETTINGS: Dict[str, List[Tuple[str, Optional[Set[int]], str]]] = {
         ("FLOW", None, "#25386"),
         ("BUMP OF CHICKEN", None, "#588"),
         ("UVERworld", None, "#9374"),
-        ("Round Table ft. Nino", None, "#1538")
+        ("Round Table ft. Nino", None, "#1538"),
     ],
 
     "Franchise": [
@@ -365,6 +367,9 @@ SUB_SETTINGS: Dict[str, List[Tuple[str, Optional[Set[int]], str]]] = {
         ("UtaPri", None, "#20038"),
         ("Symphogear", None, "#127"),
         ("Macross", None, "#74"),
+        ("Gintama", None, "#808"),
+        ("Naruto", None, "#560"),
+        ("One Piece", None, "#24958"),
     ],
 
     "Composers": [
@@ -372,13 +377,17 @@ SUB_SETTINGS: Dict[str, List[Tuple[str, Optional[Set[int]], str]]] = {
         ("TeddyLoid", None, "#22124"),
         ("Yuki Kajiura", None, "#21879"),
         ("Hiroyuki Sawano", None, "#18790"),
+        ("ryo (supercell)", None, "#27582"),
+        ("I've Sound", None, "#23234"),
     ],
 
     "Extras": [
         ("TRIGGER", None, "#25118"),
         ("Madhouse", None, "#25216"),
         ("CLAMP", None, "#17127"),
-        ("Eurobeat", None, "#260")
+        ("Eurobeat", None, "#260"),
+        ("Studio Wit", None, "#25223"),
+        ("Visual Novels", None, "#97"),
     ],
 }
 
