@@ -251,25 +251,23 @@
             );
         }
 
-        // Ranking only happens once someone has reached the threshold.
         const reached = entries.filter(e => e.score >= umaState.threshold);
-        if (reached.length === 0) return;
+
+        if (reached.length === 0) {
+            // Round continues: show each team's current victory points.
+            const { totals } = rankEntries(entries);
+
+            sendChatMessage(
+                `Current victory points: Left ${totals.Left} - ${totals.Right} Right`
+            );
+            return;
+        }
 
         endRound(entries, reached);
     }
 
-    function endRound(entries, reached) {
-        const threshold = umaState.threshold;
-
-        sendChunked(
-            "Uma Grand Prix: ",
-            reached.map(e => e.name)
-        );
-        sendChatMessage(
-            `reached ${threshold} points! The round is over. Calculating victory points...`
-        );
-
-        // Rank by in-game score, ties share the same placement and victory points.
+    // Ranks by in-game score. Ties share the same placement and victory points.
+    function rankEntries(entries) {
         const sorted = [...entries].sort((a, b) => b.score - a.score);
 
         sorted.forEach((entry, index) => {
@@ -285,19 +283,31 @@
             totals[entry.team] += entry.victoryPoints;
         }
 
-        for (const team of ["Left", "Right"]) {
-            const teamEntries = sorted.filter(e => e.team === team);
+        return { sorted, totals };
+    }
 
-            sendChunked(
-                `${team} team: `,
-                teamEntries.map(
-                    e => `${ordinal(e.rank)} ${e.name} (${e.score} pts) +${e.victoryPoints} VP`
-                )
+    function endRound(entries, reached) {
+        const threshold = umaState.threshold;
+
+        sendChunked(
+            "Uma Grand Prix: ",
+            reached.map(e => e.name)
+        );
+        sendChatMessage(
+            `reached ${threshold} points! The round is over. Calculating victory points...`
+        );
+
+        const { sorted, totals } = rankEntries(entries);
+
+        // One message per player, in placement order.
+        for (const entry of sorted) {
+            sendChatMessage(
+                `${ordinal(entry.rank)} Place: ${entry.name} (${entry.team}) ${entry.score} pts - ${entry.victoryPoints} Victory points`
             );
         }
 
         sendChatMessage(
-            `Victory points: Left ${totals.Left} - ${totals.Right} Right`
+            `Final victory points: Left ${totals.Left} - ${totals.Right} Right`
         );
 
         if (totals.Left > totals.Right) {
