@@ -1,4 +1,4 @@
-Chiabobos' Script for AMQ
+Chiabobo's Scripts for AMQ
 
 Neru mode
 - new version of Eru mode made for newbies in mind, featuring new lives counting system
