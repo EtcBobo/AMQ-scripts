@@ -8,3 +8,9 @@ NVP mode
 
 Gameroller
 - A Python file that rolls game mode for crews in PAD server
+
+Uma Grand Prix
+- A Script to count for Uma Grand Prix Crews game mode
+
+NGMC Manual counter
+- A script to show a UI for manual NGMC counting 
