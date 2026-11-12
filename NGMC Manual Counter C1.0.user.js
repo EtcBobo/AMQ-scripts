@@ -28,7 +28,7 @@ let leftLife = DEFAULT_LIVES;
 let rightLife = DEFAULT_LIVES;
 
 
-// Fonction pour envoyer un message de chat
+// Send a chat message
 function sendChatMessage(message, isTeamMessage) {
     socket.sendCommand({
         type: "lobby",
@@ -40,20 +40,20 @@ function sendChatMessage(message, isTeamMessage) {
     });
 }
 
-// Envoie le message de guess automatiquement (si la case est cochée)
+// Automatically send the guess message (if the checkbox is ticked)
 function updateMessage() {
     if (!sendGuess) return;
     sendChatMessage(players.map(p => p.count).join(""), false);
 }
 
-// Les vies sont toujours envoyées dans le chat
+// Lives are always sent to the chat
 function updateLifeDisplay() {
     $("#leftLife").text(leftLife);
     $("#rightLife").text(rightLife);
     sendChatMessage(`${leftLife}-${rightLife}`, false);
 }
 
-// Fonction principale pour créer la fenêtre
+// Main function that builds the window
 function createNGMCManagerWindow() {
     managerWindow = new AMQWindow({
         id: "ngmcWindow",
@@ -69,7 +69,7 @@ function createNGMCManagerWindow() {
     managerWindow.addPanel({ width: 1.0, height: 30, position: { x: 0, y: 132 }, id: "customPanel" });
     managerWindow.addPanel({ width: 1.0, height: 70, position: { x: 0, y: 166 }, id: "lifePanel" });
 
-    // Zone custom
+    // Reset buttons
     $("#customPanel").append(`
         <button id="resetGuesses" class="btn btn-danger" style="width: 48%;">Reset Guesses</button>
         <button id="resetLives" style="
@@ -86,7 +86,7 @@ function createNGMCManagerWindow() {
         </button>
     `);
 
-    // Zone des vies
+    // Lives area
     $("#lifePanel").append(`
         <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 5px;">
             <div style="display: flex; align-items: center; gap: 5px;">
@@ -120,7 +120,7 @@ function createNGMCManagerWindow() {
 
     displayCounters();
 
-    // Boutons de vies (pas de plafond, minimum 0)
+    // Life buttons (no upper cap, minimum 0)
     $("#leftLifeMinus").click(() => {
         if (leftLife > 0) leftLife--;
         updateLifeDisplay();
@@ -141,7 +141,7 @@ function createNGMCManagerWindow() {
         updateLifeDisplay();
     });
 
-    // Réinitialiser les guesses : chaque joueur revient à sa propre valeur initiale
+    // Reset guesses: each player goes back to their own initial value
     $("#resetGuesses").click(() => {
         players.forEach(p => {
             p.count = p.initial;
@@ -150,7 +150,7 @@ function createNGMCManagerWindow() {
         displayCounters();
     });
 
-    // Réinitialiser les vies des équipes
+    // Reset the team lives
     $("#resetLives").click(() => {
         leftLife = DEFAULT_LIVES;
         rightLife = DEFAULT_LIVES;
@@ -158,7 +158,7 @@ function createNGMCManagerWindow() {
     });
 }
 
-// Affichage des compteurs
+// Display the counters
 function displayCounters() {
     $("#counterPanel").empty();
     $("#counterPanel").append(`
@@ -184,10 +184,10 @@ function createPlayerRow(p, i) {
             <button class="btn btn-success" id="plus${i}" style="width: 26px;">+</button>
         </div>
     `).on("keydown", `#initial${i}`, event => {
-        // Empêche les raccourcis AMQ pendant la saisie
+        // Stop AMQ keyboard shortcuts from firing while typing
         event.stopPropagation();
     }).on("change", `#initial${i}`, function () {
-        // Changement de la valeur initiale du joueur : son compteur actuel passe immédiatement à cette valeur
+        // Player's initial value changed: their current count follows it (no chat message is sent)
         const value = parseInt($(this).val(), 10);
         if (isNaN(value) || value < 0) {
             $(this).val(p.initial);
@@ -196,7 +196,6 @@ function createPlayerRow(p, i) {
         p.initial = value;
         p.count = value;
         $(`#count${i}`).text(p.count);
-        updateMessage();
     }).on("click", `#plus${i}`, () => {
         p.count++;
         $(`#count${i}`).text(p.count);
@@ -231,7 +230,7 @@ let loadInterval = setInterval(() => {
     }
 }, 500);
 
-// Ajoute le bouton en haut à droite
+// Add the button to the top-right bar
 let oldWidth = $("#qpOptionContainer").width();
 $("#qpOptionContainer").width(oldWidth + 35);
 
@@ -276,14 +275,14 @@ AMQ_addStyle(`
     }
 `);
 AMQ_addStyle(`
-    /* Réduction de la taille des boutons */
+    /* Smaller buttons */
     #ngmcWindow .customWindowPanel button {
         height: 22px !important;
         padding: 1px 4px !important;
         font-size: 12px !important;
     }
 
-    /* Champs des valeurs initiales */
+    /* Initial value inputs */
     #ngmcWindow .playerInitial {
         width: 60px;
         height: 22px !important;
@@ -300,7 +299,7 @@ AMQ_addStyle(`
         margin-right: 8px;
     }
 
-    /* Réduction du padding du header */
+    /* Smaller header padding */
     #ngmcWindow .customWindowHeader {
         padding: 4px 8px !important;
         height: 28px !important;
